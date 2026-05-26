@@ -1,0 +1,9 @@
+﻿__pycache__/
+*.pyc
+.python_packages/
+*.zip
+local.settings.json
+.vscode/
+.venv/
+env/
+publishprofile.xml
