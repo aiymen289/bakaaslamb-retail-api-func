@@ -1,66 +1,67 @@
-from pydantic import BaseModel
-from typing import List, Optional
-from datetime import datetime
+from dataclasses import dataclass
+from typing import Optional
 
-class BatchItem(BaseModel):
-    batch_code: str
-    product_name: str
-    category: str
-    cost_price: float
-    retail_price: float
-    quantity_on_hand: int
-    average_daily_sales: float
-    expiry_date: str  # ISO format: "2026-01-07"
-    
-class ConfigThresholds(BaseModel):
-    expiring_soon_days: int = 5
-    stockout_risk_doc: int = 7
-    high_stock_doc: int = 30
+@dataclass
+class ConfigThresholds:
+    expiring_soon_days: int = 7
+    stockout_risk_doc: float = 3.0
+    high_stock_doc: float = 30.0
 
-class ConfigFormulas(BaseModel):
-    markdown: str = "simple"  # "simple" or "advanced"
-    markdown_elasticity: float = 1.0
+@dataclass
+class ConfigFormulas:
+    markdown: str = "standard"
+    markdown_elasticity: float = 1.5
 
-class Config(BaseModel):
-    thresholds: ConfigThresholds
-    formulas: ConfigFormulas
+@dataclass
+class Config:
+    thresholds: ConfigThresholds = None
+    formulas: ConfigFormulas = None
 
-class MetricPanel(BaseModel):
-    metric_name: str
-    value: str
-    count: int
-    badge_type: str
+    def __post_init__(self):
+        if self.thresholds is None:
+            self.thresholds = ConfigThresholds()
+        if self.formulas is None:
+            self.formulas = ConfigFormulas()
+
+@dataclass
+class MetricPanel:
+    metric_name: str = ""
+    value: str = ""
+    count: int = 0
+    badge_type: str = ""
     amount: Optional[str] = None
 
-class DashboardMetrics(BaseModel):
-    expiring_soon: MetricPanel
-    stockout_risk: MetricPanel
-    high_stock: Optional[MetricPanel] = None
+@dataclass
+class DashboardMetrics:
+    expiring_soon: MetricPanel = None
+    stockout_risk: MetricPanel = None
     waste_today: Optional[MetricPanel] = None
     gross_profit: Optional[MetricPanel] = None
     sales_today: Optional[MetricPanel] = None
 
-class InventoryItemDetail(BaseModel):
-    batch_code: str
-    product_name: str
-    category: str
-    quantity: int
-    expiry_date: str
-    days_until_expiry: int
-    cost_price: float
-    retail_price: float
-    gross_profit_per_unit: float
-    gross_profit_total: float
-    average_daily_sales: float
-    days_of_coverage: float
-    quantity_at_risk: int
-    suggested_markdown_percent: float
+@dataclass
+class InventoryItemDetail:
+    batch_code: str = ""
+    product_name: str = ""
+    category: str = ""
+    quantity: int = 0
+    expiry_date: str = ""
+    days_until_expiry: int = 0
+    cost_price: float = 0.0
+    retail_price: float = 0.0
+    gross_profit_per_unit: float = 0.0
+    gross_profit_total: float = 0.0
+    average_daily_sales: float = 0.0
+    days_of_coverage: float = 0.0
+    quantity_at_risk: int = 0
+    suggested_markdown_percent: float = 0.0
 
-class ActivityEvent(BaseModel):
-    event_type: str  # "sale", "delivery", "waste", "alert"
-    title: str
-    description: str
-    transaction_id: str
-    timestamp: str  # ISO format
+@dataclass
+class ActivityEvent:
+    event_type: str = ""
+    title: str = ""
+    description: str = ""
+    transaction_id: str = ""
+    timestamp: str = ""
     amount: Optional[str] = None
-    icon_color: str  # "green", "blue", "red", "yellow"
+    icon_color: str = ""
